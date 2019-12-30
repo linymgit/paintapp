@@ -1,13 +1,12 @@
 package com.demo.gui;
 
+import com.demo.util.Context;
 import com.demo.util.PathUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author lym
@@ -41,7 +40,7 @@ public class MainFrame implements ActionListener {
      */
     JTabbedPane tp;
 
-    Map<Integer, DrawingBoard> okMap = new HashMap<>();
+    JButton recBtn, ellBtn, lineBtn, clsBtn;
 
     public MainFrame() {
         f = new JFrame();
@@ -67,22 +66,31 @@ public class MainFrame implements ActionListener {
 
         // ---------------工具栏-----------------
         // 创建 工具栏按钮
-        JButton recBtn = new JButton();
+        recBtn = new JButton();
         recBtn.setToolTipText("矩形");
         recBtn.setIcon(new ImageIcon(PathUtils.getResourcePath() + "rectangle.png"));
+        recBtn.addActionListener(this);
 
-        JButton ellBtn = new JButton();
+        ellBtn = new JButton();
         ellBtn.setToolTipText("椭圆");
         ellBtn.setIcon(new ImageIcon(PathUtils.getResourcePath() + "ellipse.png"));
+        ellBtn.addActionListener(this);
 
-        JButton lineBtn = new JButton();
+        lineBtn = new JButton("直线");
         lineBtn.setToolTipText("直线");
         lineBtn.setIcon(new ImageIcon(PathUtils.getResourcePath() + "line.png"));
+        lineBtn.addActionListener(this);
+
+        clsBtn = new JButton("橡皮擦");
+        clsBtn.setToolTipText("橡皮擦");
+        clsBtn.setIcon(new ImageIcon(PathUtils.getResourcePath() + "line.png"));
+        clsBtn.addActionListener(this);
 
         // 添加 按钮 到 工具栏
         tb.add(recBtn);
         tb.add(ellBtn);
-//        tb.add(lineBtn);
+        tb.add(lineBtn);
+        tb.add(clsBtn);
         tb.setOrientation(SwingConstants.VERTICAL);
 
 
@@ -97,6 +105,9 @@ public class MainFrame implements ActionListener {
 //        f.add(ta);
 
         tp = new JTabbedPane();
+        tp.addChangeListener(e -> {
+            Context.getInstance().setTabIndex(tp.getSelectedIndex());
+        });
         tp.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
 
@@ -117,19 +128,29 @@ public class MainFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource().equals(newFile)) {
             DrawingBoard drawingBoard = new DrawingBoard();
-            tp.add("未命名", drawingBoard);
-            okMap.put(tp.getTabCount(), drawingBoard);
+            tp.add("未命名"+tp.getTabCount(), drawingBoard);
             f.add(tp, BorderLayout.CENTER);
+            tp.setSelectedIndex(tp.getTabCount()-1);
         }
         if (e.getSource().equals(saveFile)) {
             int selectedIndex = tp.getSelectedIndex();
             Image image = tp.createImage(tp.getWidth(), tp.getHeight());
             tp.setSelectedIndex(2);
-            okMap.get(tp.getSelectedIndex()).getGraphics().drawImage(image,0, 0, null);
             tp.repaint();
 
         }
-
+        if (e.getSource().equals(lineBtn)) {
+            Context.getInstance().setCurrentChart(Context.CHART_LINE);
+        }
+        if (e.getSource().equals(ellBtn)) {
+            Context.getInstance().setCurrentChart(Context.CHART_CIRCLE);
+        }
+        if (e.getSource().equals(recBtn)) {
+            Context.getInstance().setCurrentChart(Context.CHART_REC);
+        }
+        if (e.getSource().equals(clsBtn)) {
+            Context.getInstance().setCls(true);
+        }
     }
 
     public static void main(String[] args) {

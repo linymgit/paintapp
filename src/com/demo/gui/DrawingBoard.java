@@ -1,5 +1,11 @@
 package com.demo.gui;
 
+import com.demo.entity.Circle;
+import com.demo.entity.Line;
+import com.demo.entity.Rectangle;
+import com.demo.util.Context;
+
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -12,8 +18,6 @@ import java.awt.event.MouseMotionListener;
  * @Description 画板
  */
 public class DrawingBoard extends Panel {
-    public static final int RectangleType = 1;
-    public static final int EllipseType = 2;
 
     //类型
     private int drawType;
@@ -36,30 +40,49 @@ public class DrawingBoard extends Panel {
         // x 坐标和 y 坐标 为距离我们GUI界面左上角的位置的像素
 //        graphics.drawOval(10, 10, 30, 30);
 //        graphics.draw3DRect(50, 50, 50, 50, true);
+
+        if (Context.getInstance().isCls()) {
+            Toolkit.getDefaultToolkit().createCustomCursor(new ImageIcon("ellipse.png").getImage(),new Point(10,20), "stick");
+        }
+        Context.getInstance().paint(graphics);
+
+
     }
 
     class DefaultMouseListener implements MouseListener, MouseMotionListener {
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            System.out.println(e.getX());
-            System.out.println(e.getY());
-
             sX = e.getX();
             sY = e.getY();
         }
 
         @Override
         public void mousePressed(MouseEvent e) {
-
-
+            if (Context.getInstance().isLine()) {
+                return;
+            }
+            sX = e.getX();
+            sY = e.getY();
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
             eX = e.getX();
             eY = e.getY();
-            Self.getGraphics().drawLine(sX,sY,eX,eY);
+            int currentChart = Context.getInstance().getCurrentChart();
+            if ((currentChart & Context.CHART_CIRCLE)>0) {
+                Context.getInstance().addChart(new Circle(sX, sY, eX, eY));
+                getGraphics().drawOval(sX,sY, eX,eY);
+            }
+            if ((currentChart & Context.CHART_LINE)>0) {
+                Context.getInstance().addChart(new Line(sX, sY, eX, eY));
+                getGraphics().drawLine(sX,sY, eX,eY);
+            }
+            if ((currentChart & Context.CHART_REC)>0) {
+                Context.getInstance().addChart(new Rectangle(sX, sY, eX, eY));
+                getGraphics().drawRect(sX, sX, eX, eY);
+            }
         }
 
         @Override
@@ -74,7 +97,11 @@ public class DrawingBoard extends Panel {
 
         @Override
         public void mouseDragged(MouseEvent e) {
-
+            eX = e.getX();
+            eY = e.getY();
+            if ((Context.getInstance().getCurrentChart() & Context.CHART_REC)>0) {
+                getGraphics().drawRect(sX, sX, eX, eY);
+            }
         }
 
         @Override
