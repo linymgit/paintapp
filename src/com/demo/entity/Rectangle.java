@@ -13,12 +13,14 @@ public class Rectangle implements Chart, Serializable {
     private int sY;
     private int eX;
     private int eY;
+    private Color color;
 
-    public Rectangle(int sX, int sY, int eX, int eY) {
+    public Rectangle(int sX, int sY, int eX, int eY,Color color) {
         this.sX = sX;
         this.sY = sY;
         this.eX = eX;
         this.eY = eY;
+        this.color = color;
     }
 
     public int getsX() {
@@ -55,6 +57,7 @@ public class Rectangle implements Chart, Serializable {
 
     @Override
     public void paint(Graphics graphics) {
+        graphics.setColor(color);
         graphics.drawRect(sX, sX, Math.abs(eX-sX), Math.abs(eY-sY));
     }
 }

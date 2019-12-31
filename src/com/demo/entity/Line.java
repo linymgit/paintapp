@@ -13,12 +13,15 @@ public class Line implements Chart, Serializable {
     private int sY;
     private int eX;
     private int eY;
+    private Color color;
 
-    public Line(int sX, int sY, int eX, int eY) {
+
+    public Line(int sX, int sY, int eX, int eY,  Color color) {
         this.sX = sX;
         this.sY = sY;
         this.eX = eX;
         this.eY = eY;
+        this.color = color;
     }
 
     public int getsX() {
@@ -55,6 +58,7 @@ public class Line implements Chart, Serializable {
 
     @Override
     public void paint(Graphics graphics) {
+        graphics.setColor(color);
         graphics.drawLine(sX, sX, eX, eY);
     }
 }

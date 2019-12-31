@@ -35,7 +35,7 @@ public class MainFrame implements ActionListener {
     /**
      * 菜单选项
      */
-    JMenuItem newFile, saveFile, openFile,closeFile, helpDoc,undo;
+    JMenuItem newFile, saveFile, openFile, closeFile, helpDoc, undo;
     JScrollPane js;
 
     /**
@@ -43,7 +43,7 @@ public class MainFrame implements ActionListener {
      */
     JTabbedPane tp;
 
-    JButton recBtn, ellBtn, lineBtn, clsBtn;
+    JButton recBtn, recFBtn, ellBtn, ellFBtn, lineBtn, clsBtn, panBtn, colorBtn;
 
     public MainFrame() {
         f = new JFrame();
@@ -68,7 +68,6 @@ public class MainFrame implements ActionListener {
         undo.addActionListener(this);
 
 
-
         file = new JMenu("文件");
         edit = new JMenu("编辑");
         help = new JMenu("帮助");
@@ -89,26 +88,51 @@ public class MainFrame implements ActionListener {
         recBtn.setIcon(new ImageIcon(PathUtils.getResourcePath() + "rectangle.png"));
         recBtn.addActionListener(this);
 
+        recFBtn = new JButton();
+        recFBtn.setToolTipText("实心矩形");
+        recFBtn.setIcon(new ImageIcon(PathUtils.getResourcePath() + "rec.png"));
+        recFBtn.addActionListener(this);
+
         ellBtn = new JButton();
         ellBtn.setToolTipText("椭圆");
         ellBtn.setIcon(new ImageIcon(PathUtils.getResourcePath() + "ellipse.png"));
         ellBtn.addActionListener(this);
 
-        lineBtn = new JButton("直线");
+        ellFBtn = new JButton();
+        ellFBtn.setToolTipText("实心椭圆");
+        ellFBtn.setIcon(new ImageIcon(PathUtils.getResourcePath() + "ell.png"));
+        ellFBtn.addActionListener(this);
+
+
+        lineBtn = new JButton();
         lineBtn.setToolTipText("直线");
         lineBtn.setIcon(new ImageIcon(PathUtils.getResourcePath() + "line.png"));
         lineBtn.addActionListener(this);
 
-        clsBtn = new JButton("橡皮擦");
+        clsBtn = new JButton();
         clsBtn.setToolTipText("橡皮擦");
-        clsBtn.setIcon(new ImageIcon(PathUtils.getResourcePath() + "line.png"));
+        clsBtn.setIcon(new ImageIcon(PathUtils.getResourcePath() + "eraser.png"));
         clsBtn.addActionListener(this);
+
+        panBtn = new JButton();
+        panBtn.setToolTipText("画笔");
+        panBtn.setIcon(new ImageIcon(PathUtils.getResourcePath() + "pan.png"));
+        panBtn.addActionListener(this);
+
+        colorBtn = new JButton();
+        colorBtn.setToolTipText("颜色");
+        colorBtn.setIcon(new ImageIcon(PathUtils.getResourcePath() + "color.png"));
+        colorBtn.addActionListener(this);
 
         // 添加 按钮 到 工具栏
         tb.add(recBtn);
+        tb.add(recFBtn);
         tb.add(ellBtn);
+        tb.add(ellFBtn);
         tb.add(lineBtn);
         tb.add(clsBtn);
+        tb.add(panBtn);
+        tb.add(colorBtn);
         tb.setOrientation(SwingConstants.VERTICAL);
 
 
@@ -121,18 +145,12 @@ public class MainFrame implements ActionListener {
 
 
         f.add(tb, BorderLayout.WEST);
-//        f.add(ta);
 
         tp = new JTabbedPane();
         tp.addChangeListener(e -> {
             Context.getInstance().setTabIndex(tp.getSelectedIndex());
         });
         tp.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-
-//        DrawingBoard drawingBoard = new DrawingBoard();
-//        tp.add("未命名",drawingBoard );
-//        drawingBoard.setBackground();
         f.add(tp, BorderLayout.CENTER);
 
 
@@ -146,8 +164,8 @@ public class MainFrame implements ActionListener {
 
         DrawingBoard drawingBoard = new DrawingBoard();
         AtomicInteger tabIndex = DrawingBoard.tabIndex;
-        tp.add("未命名"+tabIndex.get(), drawingBoard);
-        tp.setSelectedIndex(tp.getTabCount()-1);
+        tp.add("未命名" + tabIndex.get(), drawingBoard);
+        tp.setSelectedIndex(tp.getTabCount() - 1);
         Context.getInstance().setTabIndex(tabIndex.get());
     }
 
@@ -158,12 +176,12 @@ public class MainFrame implements ActionListener {
         if (e.getSource().equals(newFile)) {
             DrawingBoard drawingBoard = new DrawingBoard();
             AtomicInteger tabIndex = DrawingBoard.tabIndex;
-            tp.add("未命名"+tabIndex.get(), drawingBoard);
-            tp.setSelectedIndex(tp.getTabCount()-1);
+            tp.add("未命名" + tabIndex.get(), drawingBoard);
+            tp.setSelectedIndex(tp.getTabCount() - 1);
             Context.getInstance().setTabIndex(tabIndex.get());
         }
         if (e.getSource().equals(closeFile)) {
-            if (tp.getTabCount()<=0) {
+            if (tp.getTabCount() <= 0) {
                 return;
             }
             int selectedIndex = tp.getSelectedIndex();
@@ -174,7 +192,7 @@ public class MainFrame implements ActionListener {
             if (Objects.nonNull(openFileInfo)) {
                 DrawingBoard drawingBoard = new DrawingBoard();
                 tp.add(openFileInfo.getFileName(), drawingBoard);
-                int i = tp.getTabCount()- 1;
+                int i = tp.getTabCount() - 1;
                 tp.setSelectedIndex(i);
                 Context.getInstance().putCharts(drawingBoard.getMyTabIndex(), openFileInfo.getCharts());
             }
@@ -190,12 +208,24 @@ public class MainFrame implements ActionListener {
         }
         if (e.getSource().equals(lineBtn)) {
             Context.getInstance().setCurrentChart(Context.CHART_LINE);
+            DrawingBoard drawingBoard =(DrawingBoard) tp.getSelectedComponent();
+            drawingBoard.setsX(0);
+            drawingBoard.setsY(0);
         }
         if (e.getSource().equals(ellBtn)) {
             Context.getInstance().setCurrentChart(Context.CHART_CIRCLE);
         }
+        if (e.getSource().equals(ellFBtn)) {
+            Context.getInstance().setCurrentChart(Context.CHART_FULL_CIRCLE);
+        }
         if (e.getSource().equals(recBtn)) {
             Context.getInstance().setCurrentChart(Context.CHART_REC);
+        }
+        if (e.getSource().equals(recFBtn)) {
+            Context.getInstance().setCurrentChart(Context.CHART_FULL_REC);
+        }
+        if (e.getSource().equals(panBtn)) {
+            Context.getInstance().setCurrentChart(Context.CHART_PAN);
         }
         if (e.getSource().equals(clsBtn)) {
             Context.getInstance().setCls(true);
@@ -204,10 +234,27 @@ public class MainFrame implements ActionListener {
             Context.getInstance().undo();
             tp.getSelectedComponent().repaint();
         }
+        if (e.getSource().equals(colorBtn)) {
+            Color color = JColorChooser.showDialog(f, "选取颜色", null);
+            // 如果用户取消或关闭窗口, 则返回的 color 为 null
+            if (color == null) {
+                return;
+            }
+            Context.getInstance().setCurrentColor(color);
+        }
+        if (Objects.nonNull(tp.getSelectedComponent())) {
+            if (Context.getInstance().isCls()) {
+                String fileName = PathUtils.getResourcePath() + "eraser.png";
+                Toolkit tk = Toolkit.getDefaultToolkit();
+                Image img = tk.getImage(fileName);
+                Cursor cu = tk.createCustomCursor(img, new Point(1, 1), "clear");
+                tp.getSelectedComponent().setCursor(cu);
+            } else {
+                tp.getSelectedComponent().setCursor(Cursor.getDefaultCursor());
+            }
+        }
+
     }
 
-//    public static void main(String[] args) {
-//        new MainFrame();
-//    }
 }
 

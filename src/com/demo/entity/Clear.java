@@ -6,21 +6,20 @@ import java.io.Serializable;
 /**
  * @auth linyimin
  * @QQ: 1317113287
- * @desc: 圆形
+ * @desc: 清除图形
  **/
-public class Circle implements Chart, Serializable {
+public class Clear implements Chart, Serializable {
+
     private int sX;
     private int sY;
     private int eX;
     private int eY;
-    private Color color;
 
-    public Circle(int sX, int sY, int eX, int eY, Color color) {
+    public Clear(int sX, int sY, int eX, int eY) {
         this.sX = sX;
         this.sY = sY;
         this.eX = eX;
         this.eY = eY;
-        this.color = color;
     }
 
     public int getsX() {
@@ -57,7 +56,6 @@ public class Circle implements Chart, Serializable {
 
     @Override
     public void paint(Graphics graphics) {
-        graphics.setColor(color);
-        graphics.drawOval(sX, sX, eX, eY);
+        graphics.clearRect(sX, sY, eX, eY);
     }
 }

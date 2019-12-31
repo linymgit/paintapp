@@ -6,16 +6,16 @@ import java.io.Serializable;
 /**
  * @auth linyimin
  * @QQ: 1317113287
- * @desc: 圆形
+ * @desc: 实心圆形
  **/
-public class Circle implements Chart, Serializable {
+public class CircleFull implements Chart, Serializable {
     private int sX;
     private int sY;
     private int eX;
     private int eY;
     private Color color;
 
-    public Circle(int sX, int sY, int eX, int eY, Color color) {
+    public CircleFull(int sX, int sY, int eX, int eY, Color color) {
         this.sX = sX;
         this.sY = sY;
         this.eX = eX;
@@ -58,6 +58,6 @@ public class Circle implements Chart, Serializable {
     @Override
     public void paint(Graphics graphics) {
         graphics.setColor(color);
-        graphics.drawOval(sX, sX, eX, eY);
+        graphics.fillOval(sX, sX, eX, eY);
     }
 }

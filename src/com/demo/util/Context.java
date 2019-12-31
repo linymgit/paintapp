@@ -16,8 +16,16 @@ import java.util.concurrent.ConcurrentHashMap;
  **/
 public class Context {
     public static final int CHART_LINE = 1;
-    public static final int CHART_REC = 1<<2;
-    public static final int CHART_CIRCLE = 1<<3;
+    public static final int CHART_REC = 1 << 2;
+    public static final int CHART_CIRCLE = 1 << 3;
+    public static final int CHART_PAN = 1 << 4;
+    public static final int CHART_FULL_CIRCLE = 1 << 5;
+    public static final int CHART_FULL_REC = 1 << 6;
+
+    /**
+     * 当前选择的颜色
+     */
+    private Color currentColor;
 
     /**
      * 用户当前选择的图形
@@ -62,30 +70,30 @@ public class Context {
     public void paint(Graphics graphics) {
         List<Chart> charts = chartsMap.get(tabIndex);
         if (Objects.isNull(charts)) {
-            return ;
+            return;
         }
         charts.forEach(chart -> chart.paint(graphics));
     }
 
-    public List<Chart> getCurrentCharts(){
+    public List<Chart> getCurrentCharts() {
         return chartsMap.get(tabIndex);
     }
 
-    public void putCharts(Integer idx, List<Chart> charts){
+    public void putCharts(Integer idx, List<Chart> charts) {
         chartsMap.put(idx, charts);
         setTabIndex(idx);
     }
 
-    public void removeCharts(Integer idx){
+    public void removeCharts(Integer idx) {
         chartsMap.remove(idx);
     }
 
-    public void undo(){
+    public void undo() {
         List<Chart> charts = chartsMap.get(tabIndex);
-        if (charts.size()<=0) {
+        if (Objects.isNull(charts)||charts.size() <= 0) {
             return;
         }
-        charts.remove(charts.size()-1);
+        charts.remove(charts.size() - 1);
     }
 
     public int getCurrentChart() {
@@ -94,6 +102,7 @@ public class Context {
 
     public void setCurrentChart(int currentChart) {
         CurrentChart = currentChart;
+        isCls = false;
     }
 
     public int getTabIndex() {
@@ -104,16 +113,16 @@ public class Context {
         this.tabIndex = tabIndex;
     }
 
-    public boolean isCircle(){
-        return (getCurrentChart()&CHART_CIRCLE)>0;
+    public boolean isCircle() {
+        return (getCurrentChart() & CHART_CIRCLE) > 0;
     }
 
-    public boolean isLine(){
-        return (getCurrentChart()&CHART_LINE)>0;
+    public boolean isLine() {
+        return (getCurrentChart() & CHART_LINE) > 0;
     }
 
-    public boolean isRect(){
-        return (getCurrentChart()&CHART_REC)>0;
+    public boolean isRect() {
+        return (getCurrentChart() & CHART_REC) > 0;
     }
 
     public boolean isCls() {
@@ -122,5 +131,13 @@ public class Context {
 
     public void setCls(boolean cls) {
         isCls = cls;
+    }
+
+    public Color getCurrentColor() {
+        return currentColor;
+    }
+
+    public void setCurrentColor(Color currentColor) {
+        this.currentColor = currentColor;
     }
 }
