@@ -1,13 +1,14 @@
 package com.demo.entity;
 
 import java.awt.*;
+import java.io.Serializable;
 
 /**
  * @auth linyimin
  * @QQ: 1317113287
  * @desc: 矩形
  **/
-public class Rectangle implements Chart{
+public class Rectangle implements Chart, Serializable {
     private int sX;
     private int sY;
     private int eX;

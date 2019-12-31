@@ -1,13 +1,14 @@
 package com.demo.entity;
 
 import java.awt.*;
+import java.io.Serializable;
 
 /**
  * @auth linyimin
  * @QQ: 1317113287
  * @desc: 直线
  **/
-public class Line implements Chart {
+public class Line implements Chart, Serializable {
     private int sX;
     private int sY;
     private int eX;

@@ -67,6 +67,19 @@ public class Context {
         charts.forEach(chart -> chart.paint(graphics));
     }
 
+    public List<Chart> getCurrentCharts(){
+        return chartsMap.get(tabIndex);
+    }
+
+    public void putCharts(Integer idx, List<Chart> charts){
+        chartsMap.put(idx, charts);
+        setTabIndex(idx);
+    }
+
+    public void removeCharts(Integer idx){
+        chartsMap.remove(idx);
+    }
+
     public int getCurrentChart() {
         return CurrentChart;
     }

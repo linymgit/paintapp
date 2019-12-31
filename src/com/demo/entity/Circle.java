@@ -1,13 +1,14 @@
 package com.demo.entity;
 
 import java.awt.*;
+import java.io.Serializable;
 
 /**
  * @auth linyimin
  * @QQ: 1317113287
  * @desc: 圆形
  **/
-public class Circle implements Chart {
+public class Circle implements Chart, Serializable {
     private int sX;
     private int sY;
     private int eX;

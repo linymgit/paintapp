@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author lym
@@ -19,34 +20,27 @@ import java.awt.event.MouseMotionListener;
  */
 public class DrawingBoard extends Panel {
 
-    //类型
-    private int drawType;
+    public static AtomicInteger tabIndex = new AtomicInteger(0);
+
+    private int myTabIndex;
 
     private DrawingBoard Self;
 
-    private int sX,sY,eX,eY;
+    private int sX, sY, eX, eY;
 
-    DrawingBoard(){
+    DrawingBoard() {
         DefaultMouseListener defaultMouseListener = new DefaultMouseListener();
         this.addMouseListener(defaultMouseListener);
         this.addMouseMotionListener(defaultMouseListener);
         Self = this;
+        myTabIndex = tabIndex.addAndGet(1);
     }
-//
+
     public void paint(Graphics graphics) {
         // 1.调用父类完成初始化任务
         super.paint(graphics);
-        // 简单的画一个圆圈 使用该方法drawOval 参数为 x 坐标 y 坐标 宽度 高度 单位都是像素
-        // x 坐标和 y 坐标 为距离我们GUI界面左上角的位置的像素
-//        graphics.drawOval(10, 10, 30, 30);
-//        graphics.draw3DRect(50, 50, 50, 50, true);
-
-        if (Context.getInstance().isCls()) {
-            Toolkit.getDefaultToolkit().createCustomCursor(new ImageIcon("ellipse.png").getImage(),new Point(10,20), "stick");
-        }
+        Context.getInstance().setTabIndex(myTabIndex);
         Context.getInstance().paint(graphics);
-
-
     }
 
     class DefaultMouseListener implements MouseListener, MouseMotionListener {
@@ -71,15 +65,15 @@ public class DrawingBoard extends Panel {
             eX = e.getX();
             eY = e.getY();
             int currentChart = Context.getInstance().getCurrentChart();
-            if ((currentChart & Context.CHART_CIRCLE)>0) {
+            if ((currentChart & Context.CHART_CIRCLE) > 0) {
                 Context.getInstance().addChart(new Circle(sX, sY, eX, eY));
-                getGraphics().drawOval(sX,sY, eX,eY);
+                getGraphics().drawOval(sX, sY, eX, eY);
             }
-            if ((currentChart & Context.CHART_LINE)>0) {
+            if ((currentChart & Context.CHART_LINE) > 0) {
                 Context.getInstance().addChart(new Line(sX, sY, eX, eY));
-                getGraphics().drawLine(sX,sY, eX,eY);
+                getGraphics().drawLine(sX, sY, eX, eY);
             }
-            if ((currentChart & Context.CHART_REC)>0) {
+            if ((currentChart & Context.CHART_REC) > 0) {
                 Context.getInstance().addChart(new Rectangle(sX, sY, eX, eY));
                 getGraphics().drawRect(sX, sX, eX, eY);
             }
@@ -97,11 +91,11 @@ public class DrawingBoard extends Panel {
 
         @Override
         public void mouseDragged(MouseEvent e) {
-            eX = e.getX();
-            eY = e.getY();
-            if ((Context.getInstance().getCurrentChart() & Context.CHART_REC)>0) {
-                getGraphics().drawRect(sX, sX, eX, eY);
-            }
+//            eX = e.getX();
+//            eY = e.getY();
+//            if ((Context.getInstance().getCurrentChart() & Context.CHART_REC)>0) {
+//                getGraphics().drawRect(sX, sX, eX, eY);
+//            }
         }
 
         @Override
@@ -110,4 +104,11 @@ public class DrawingBoard extends Panel {
         }
     }
 
+    public int getMyTabIndex() {
+        return myTabIndex;
+    }
+
+    public void setMyTabIndex(int myTabIndex) {
+        this.myTabIndex = myTabIndex;
+    }
 }

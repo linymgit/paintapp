@@ -1,5 +1,7 @@
 package com.demo;
 
+import com.demo.gui.MainFrame;
+
 /**
  * @author lym
  * @Date 2019/12/30 10:17
@@ -8,6 +10,6 @@ package com.demo;
  */
 public class Main {
     public static void main(String[] args) {
-
+        new MainFrame();
     }
 }

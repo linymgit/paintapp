@@ -1,12 +1,18 @@
 package com.demo.gui;
 
+import com.demo.entity.Chart;
 import com.demo.util.Context;
+import com.demo.util.FileUtils;
 import com.demo.util.PathUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author lym
@@ -31,8 +37,7 @@ public class MainFrame implements ActionListener {
     /**
      * 菜单选项
      */
-    JMenuItem cut, copy, paste, selectAll;
-    JMenuItem newFile, saveFile, openFile;
+    JMenuItem newFile, saveFile, openFile,closeFile, helpDoc;
     JScrollPane js;
 
     /**
@@ -51,10 +56,15 @@ public class MainFrame implements ActionListener {
         newFile = new JMenuItem("创建");
         saveFile = new JMenuItem("保存");
         openFile = new JMenuItem("打开");
+        closeFile = new JMenuItem("关闭当前文件");
+
+        helpDoc = new JMenuItem("说明文档");
 
         newFile.addActionListener(this);
         saveFile.addActionListener(this);
         openFile.addActionListener(this);
+        closeFile.addActionListener(this);
+        helpDoc.addActionListener(this);
 
 
         file = new JMenu("文件");
@@ -63,6 +73,9 @@ public class MainFrame implements ActionListener {
         file.add(newFile);
         file.add(saveFile);
         file.add(openFile);
+        file.add(closeFile);
+
+        help.add(helpDoc);
 
         // ---------------工具栏-----------------
         // 创建 工具栏按钮
@@ -126,18 +139,38 @@ public class MainFrame implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent e) {
+        if (e.getSource().equals(helpDoc)) {
+            HelpDialog.show(this.f, this.tp);
+        }
         if (e.getSource().equals(newFile)) {
             DrawingBoard drawingBoard = new DrawingBoard();
-            tp.add("未命名"+tp.getTabCount(), drawingBoard);
-            f.add(tp, BorderLayout.CENTER);
+            AtomicInteger tabIndex = DrawingBoard.tabIndex;
+            tp.add("未命名"+tabIndex.get(), drawingBoard);
             tp.setSelectedIndex(tp.getTabCount()-1);
+            Context.getInstance().setTabIndex(tabIndex.get());
+        }
+        if (e.getSource().equals(closeFile)) {
+            int selectedIndex = tp.getSelectedIndex();
+            tp.remove(selectedIndex);
+        }
+        if (e.getSource().equals(openFile)) {
+            FileUtils.OpenFileInfo openFileInfo = FileUtils.openFile(this.f);
+            if (Objects.nonNull(openFileInfo)) {
+                DrawingBoard drawingBoard = new DrawingBoard();
+                tp.add(openFileInfo.getFileName(), drawingBoard);
+                int i = tp.getTabCount()- 1;
+                tp.setSelectedIndex(i);
+                Context.getInstance().putCharts(drawingBoard.getMyTabIndex(), openFileInfo.getCharts());
+            }
         }
         if (e.getSource().equals(saveFile)) {
-            int selectedIndex = tp.getSelectedIndex();
-            Image image = tp.createImage(tp.getWidth(), tp.getHeight());
-            tp.setSelectedIndex(2);
-            tp.repaint();
-
+            final BufferedImage targetImg = new BufferedImage(900, 600, BufferedImage.TYPE_INT_RGB);
+            final Graphics2D g2d = targetImg.createGraphics();
+            Context.getInstance().paint(g2d);
+            String s = FileUtils.saveFile(targetImg, Context.getInstance().getCurrentCharts());
+            if (Objects.nonNull(s)) {
+                tp.setTitleAt(tp.getSelectedIndex(), s);
+            }
         }
         if (e.getSource().equals(lineBtn)) {
             Context.getInstance().setCurrentChart(Context.CHART_LINE);
@@ -153,8 +186,8 @@ public class MainFrame implements ActionListener {
         }
     }
 
-    public static void main(String[] args) {
-        new MainFrame();
-    }
+//    public static void main(String[] args) {
+//        new MainFrame();
+//    }
 }
 
