@@ -80,6 +80,14 @@ public class Context {
         chartsMap.remove(idx);
     }
 
+    public void undo(){
+        List<Chart> charts = chartsMap.get(tabIndex);
+        if (charts.size()<=0) {
+            return;
+        }
+        charts.remove(charts.size()-1);
+    }
+
     public int getCurrentChart() {
         return CurrentChart;
     }

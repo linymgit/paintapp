@@ -1,6 +1,5 @@
 package com.demo.gui;
 
-import com.demo.entity.Chart;
 import com.demo.util.Context;
 import com.demo.util.FileUtils;
 import com.demo.util.PathUtils;
@@ -10,7 +9,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -37,7 +35,7 @@ public class MainFrame implements ActionListener {
     /**
      * 菜单选项
      */
-    JMenuItem newFile, saveFile, openFile,closeFile, helpDoc;
+    JMenuItem newFile, saveFile, openFile,closeFile, helpDoc,undo;
     JScrollPane js;
 
     /**
@@ -60,14 +58,19 @@ public class MainFrame implements ActionListener {
 
         helpDoc = new JMenuItem("说明文档");
 
+        undo = new JMenuItem("撤回");
+
         newFile.addActionListener(this);
         saveFile.addActionListener(this);
         openFile.addActionListener(this);
         closeFile.addActionListener(this);
         helpDoc.addActionListener(this);
+        undo.addActionListener(this);
+
 
 
         file = new JMenu("文件");
+        edit = new JMenu("编辑");
         help = new JMenu("帮助");
 
         file.add(newFile);
@@ -76,6 +79,8 @@ public class MainFrame implements ActionListener {
         file.add(closeFile);
 
         help.add(helpDoc);
+
+        edit.add(undo);
 
         // ---------------工具栏-----------------
         // 创建 工具栏按钮
@@ -108,6 +113,7 @@ public class MainFrame implements ActionListener {
 
 
         mb.add(file);
+        mb.add(edit);
         mb.add(help);
 
         f.setJMenuBar(mb);
@@ -136,6 +142,13 @@ public class MainFrame implements ActionListener {
         f.setSize(900, 600);
         f.setLocationRelativeTo(null);
         f.setVisible(true);
+
+
+        DrawingBoard drawingBoard = new DrawingBoard();
+        AtomicInteger tabIndex = DrawingBoard.tabIndex;
+        tp.add("未命名"+tabIndex.get(), drawingBoard);
+        tp.setSelectedIndex(tp.getTabCount()-1);
+        Context.getInstance().setTabIndex(tabIndex.get());
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -150,6 +163,9 @@ public class MainFrame implements ActionListener {
             Context.getInstance().setTabIndex(tabIndex.get());
         }
         if (e.getSource().equals(closeFile)) {
+            if (tp.getTabCount()<=0) {
+                return;
+            }
             int selectedIndex = tp.getSelectedIndex();
             tp.remove(selectedIndex);
         }
@@ -183,6 +199,10 @@ public class MainFrame implements ActionListener {
         }
         if (e.getSource().equals(clsBtn)) {
             Context.getInstance().setCls(true);
+        }
+        if (e.getSource().equals(undo)) {
+            Context.getInstance().undo();
+            tp.getSelectedComponent().repaint();
         }
     }
 
