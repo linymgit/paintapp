@@ -1,13 +1,13 @@
 package com.demo.gui;
 
-import com.demo.entity.*;
-import com.demo.entity.Rectangle;
 import com.demo.util.Context;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -26,40 +26,70 @@ public class DrawingBoard extends Panel {
 
     private int sX, sY, eX, eY;
 
+    private BufferedImage targetImg;
+
+    private Graphics2D g;
+
+    private String filePath;
+
+    private int drawlineCount;
+    Toolkit tool = this.getToolkit();
+
     DrawingBoard() {
         DefaultMouseListener defaultMouseListener = new DefaultMouseListener();
         this.addMouseListener(defaultMouseListener);
         this.addMouseMotionListener(defaultMouseListener);
         Self = this;
         myTabIndex = tabIndex.addAndGet(1);
+        targetImg = new BufferedImage(900, 600, BufferedImage.TYPE_INT_ARGB);
+        g = targetImg.createGraphics();
+        this.setBackground(Color.lightGray);
+        g.setBackground(Color.lightGray);
     }
 
     public void paint(Graphics graphics) {
         // 1.调用父类完成初始化任务
         super.paint(graphics);
-        Context.getInstance().setTabIndex(myTabIndex);
-        Context.getInstance().paint(graphics);
+        if (Objects.nonNull(filePath) && !filePath.isEmpty()) {
+            paint4Img();
+        }
+        doPaint();
     }
+
+    private void paint4Img(){
+        Image image = tool.getImage(filePath);
+        getGraphics().drawImage(image, 0, 0, image.getWidth(this),image.getHeight(this), this);
+        Image image2 = tool.getImage(filePath);
+        g.drawImage(image2, 0, 0, image2.getWidth(Self),image2.getHeight(Self), Self);
+    }
+
+    private void doPaint(){
+        getGraphics().drawImage(targetImg, 0, 0, targetImg.getWidth(this),targetImg.getHeight(this), this);
+    }
+
 
     class DefaultMouseListener implements MouseListener, MouseMotionListener {
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            if (!Context.getInstance().isCls() && sX!= e.getX() && sY !=e.getY() && sX!=0 && sY!=0) {
-                Graphics graphics = getGraphics();
-                Color color = Context.getInstance().getCurrentColor();
-                graphics.setColor(color);
-                Context.getInstance().addChart(new Line(sX, sY, e.getX(), e.getY(),color));
-                graphics.drawLine(sX, sY, e.getX(), e.getY());
-            }
-            sX = e.getX();
-            sY = e.getY();
         }
 
         @Override
         public void mousePressed(MouseEvent e) {
-//            sX = e.getX();
-//            sY = e.getY();
+            if (Context.getInstance().isLine()&&!Context.getInstance().isCls() ) {
+                if (drawlineCount>0) {
+                    g.setColor(Context.getInstance().getCurrentColor());
+                    g.drawLine(sX, sY, e.getX(), e.getY());
+                    doPaint();
+                }
+                sX = e.getX();
+                sY = e.getY();
+                drawlineCount++;
+                return;
+            }
+
+            sX = e.getX();
+            sY = e.getY();
         }
 
         @Override
@@ -70,29 +100,30 @@ public class DrawingBoard extends Panel {
             eX = e.getX();
             eY = e.getY();
             if (Context.getInstance().isCls()) {
-                graphics.clearRect(sX, sY, eX, eY);
-                Context.getInstance().addChart(new Clear(sX, sY, eX, eY));
+                g.clearRect(sX, sY, eX, eY);
+                doPaint();
                 return;
             }
             int currentChart = Context.getInstance().getCurrentChart();
             if ((currentChart & Context.CHART_CIRCLE) > 0) {
-                Context.getInstance().addChart(new Circle(sX, sY, eX, eY,color));
-                graphics.drawOval(sX, sY, eX, eY);
-            }
-            if ((currentChart & Context.CHART_LINE) > 0) {
-                return;
+                g.setColor(color);
+                g.drawOval(sX, sY, eX, eY);
+                doPaint();
             }
             if ((currentChart & Context.CHART_REC) > 0) {
-                Context.getInstance().addChart(new Rectangle(sX, sY, eX, eY,color));
-                graphics.drawRect(sX, sX, eX, eY);
+                g.setColor(color);
+                g.drawRect(sX, sY, eX, eY);
+                doPaint();
             }
             if ((currentChart & Context.CHART_FULL_CIRCLE) > 0) {
-                Context.getInstance().addChart(new CircleFull(sX, sY, eX, eY,color));
-                graphics.fillOval(sX, sX, eX, eY);
+                g.setColor(color);
+                g.fillOval(sX, sY, eX, eY);
+                doPaint();
             }
             if ((currentChart & Context.CHART_FULL_REC) > 0) {
-                Context.getInstance().addChart(new RectangleFull(sX, sY, eX, eY,color));
-                graphics.fillRect(sX, sX, eX, eY);
+                g.setColor(color);
+                g.fillRect(sX, sY, eX, eY);
+                doPaint();
             }
         }
 
@@ -109,16 +140,15 @@ public class DrawingBoard extends Panel {
             if (Context.getInstance().isCls()) {
                 return;
             }
-
-
-            if ((Context.getInstance().getCurrentChart() & Context.CHART_PAN) > 0) {
+            if (Context.getInstance().isPan()) {
                 eX = e.getX();
                 eY = e.getY();
-                Graphics graphics = getGraphics();
-                graphics.setColor(Context.getInstance().getCurrentColor());
-                graphics.drawLine(sX, sY, eX, eY);
+                g.setColor(Context.getInstance().getCurrentColor());
+                g.drawLine(sX, sY, eX, eY);
                 sX = e.getX();
                 sY = e.getY();
+//                repaint();
+                doPaint();
             }
 
         }
@@ -168,5 +198,29 @@ public class DrawingBoard extends Panel {
 
     public void seteY(int eY) {
         this.eY = eY;
+    }
+
+    public BufferedImage getTargetImg() {
+        return targetImg;
+    }
+
+    public void setTargetImg(BufferedImage targetImg) {
+        this.targetImg = targetImg;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public int getDrawlineCount() {
+        return drawlineCount;
+    }
+
+    public void setDrawlineCount(int drawlineCount) {
+        this.drawlineCount = drawlineCount;
     }
 }

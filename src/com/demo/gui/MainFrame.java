@@ -9,6 +9,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -188,20 +189,18 @@ public class MainFrame implements ActionListener {
             tp.remove(selectedIndex);
         }
         if (e.getSource().equals(openFile)) {
-            FileUtils.OpenFileInfo openFileInfo = FileUtils.openFile(this.f);
-            if (Objects.nonNull(openFileInfo)) {
+            File file = FileUtils.openFile(this.f);
+            if (Objects.nonNull(file)) {
                 DrawingBoard drawingBoard = new DrawingBoard();
-                tp.add(openFileInfo.getFileName(), drawingBoard);
+                drawingBoard.setFilePath(file.getPath());
+                tp.add(file.getName(), drawingBoard);
                 int i = tp.getTabCount() - 1;
                 tp.setSelectedIndex(i);
-                Context.getInstance().putCharts(drawingBoard.getMyTabIndex(), openFileInfo.getCharts());
             }
         }
         if (e.getSource().equals(saveFile)) {
-            final BufferedImage targetImg = new BufferedImage(900, 600, BufferedImage.TYPE_INT_RGB);
-            final Graphics2D g2d = targetImg.createGraphics();
-            Context.getInstance().paint(g2d);
-            String s = FileUtils.saveFile(targetImg, Context.getInstance().getCurrentCharts());
+            DrawingBoard drawingBoard=(DrawingBoard) tp.getSelectedComponent();
+            String s = FileUtils.saveFile(drawingBoard.getTargetImg());
             if (Objects.nonNull(s)) {
                 tp.setTitleAt(tp.getSelectedIndex(), s);
             }
@@ -209,8 +208,7 @@ public class MainFrame implements ActionListener {
         if (e.getSource().equals(lineBtn)) {
             Context.getInstance().setCurrentChart(Context.CHART_LINE);
             DrawingBoard drawingBoard =(DrawingBoard) tp.getSelectedComponent();
-            drawingBoard.setsX(0);
-            drawingBoard.setsY(0);
+            drawingBoard.setDrawlineCount(0);
         }
         if (e.getSource().equals(ellBtn)) {
             Context.getInstance().setCurrentChart(Context.CHART_CIRCLE);
@@ -231,7 +229,7 @@ public class MainFrame implements ActionListener {
             Context.getInstance().setCls(true);
         }
         if (e.getSource().equals(undo)) {
-            Context.getInstance().undo();
+            Context.getInstance().undoV2();
             tp.getSelectedComponent().repaint();
         }
         if (e.getSource().equals(colorBtn)) {

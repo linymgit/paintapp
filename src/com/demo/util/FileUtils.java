@@ -17,11 +17,11 @@ import java.util.List;
  */
 public class FileUtils {
 
-    public static String saveFile(BufferedImage targetImg, List<Chart> charts) {
+    public static String saveFile(BufferedImage targetImg) {
         //弹出文件选择框
         JFileChooser chooser = new JFileChooser();
         //后缀名过滤器
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("图片文件(*.jpeg)", "jpeg");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("图片文件(*.png)", "png");
         chooser.setFileFilter(filter);
         //下面的方法将阻塞，直到【用户按下保存按钮且“文件名”文本框不为空】或【用户按下取消按钮】
         int option = chooser.showSaveDialog(null);
@@ -29,40 +29,34 @@ public class FileUtils {
             File file = chooser.getSelectedFile();
             String fname = chooser.getName(file);    //从文件名输入框中获取文件名
             //假如用户填写的文件名不带我们制定的后缀名，那么我们给它添上后缀
-            if (!fname.contains(".jpeg")) {
-                file = new File(chooser.getCurrentDirectory(), fname + ".jpeg");
+            if (!fname.contains(".png")) {
+                file = new File(chooser.getCurrentDirectory(), fname + ".png");
             }
-            File projFile = new File(file.getPath().substring(0, file.getPath().lastIndexOf(".")) + ".proj");
             try (
                     FileOutputStream fos = new FileOutputStream(file);
-
-                    FileOutputStream fosProj = new FileOutputStream(projFile);
-
-                    ObjectOutputStream objectOutputStream = new ObjectOutputStream(fosProj)
             ) {
                 //写文件操作……
 //                fos.write(bs);
-                ImageIO.write(targetImg, "JPEG", fos);
-                objectOutputStream.writeObject(charts);
-                return fname;
+                ImageIO.write(targetImg, "png", fos);
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            return file.getName();
         }
         return null;
     }
 
-    public static OpenFileInfo openFile(JFrame jf) {
+    public static File openFile(JFrame jf) {
         //弹出文件选择框
         JFileChooser chooser = new JFileChooser();
         //后缀名过滤器
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("画图小程序工程文件(*.proj)", "proj");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("画图小程序工程文件(*.png)", "png");
         chooser.setFileFilter(filter);
         //下面的方法将阻塞，直到【用户按下保存按钮且“文件名”文本框不为空】或【用户按下取消按钮】
         int option = chooser.showOpenDialog(null);
         if (option == JFileChooser.APPROVE_OPTION) {
             File file = chooser.getSelectedFile();
-            if (!file.getName().endsWith(".proj")) {
+            if (!file.getName().endsWith(".png")) {
                 // 消息对话框无返回, 仅做通知作用
                 JOptionPane.showMessageDialog(
                         jf,
@@ -71,13 +65,7 @@ public class FileUtils {
                         JOptionPane.ERROR_MESSAGE
                 );
             }
-            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-                return new OpenFileInfo((List<Chart>) ois.readObject(),file.getName());
-//                charts.forEach(chart -> System.out.println(chart));
-            } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-
+            return file;
         }
         return null;
     }

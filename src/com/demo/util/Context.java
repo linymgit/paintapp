@@ -42,6 +42,11 @@ public class Context {
      */
     private boolean isCls;
 
+    /**
+     * 选择撤回
+     */
+    private boolean isUndo;
+
     private Map<Integer, List<Chart>> chartsMap = new ConcurrentHashMap<>();
 
     private Context() {
@@ -96,6 +101,10 @@ public class Context {
         charts.remove(charts.size() - 1);
     }
 
+    public void undoV2(){
+        isUndo = true;
+    }
+
     public int getCurrentChart() {
         return CurrentChart;
     }
@@ -103,6 +112,7 @@ public class Context {
     public void setCurrentChart(int currentChart) {
         CurrentChart = currentChart;
         isCls = false;
+        isUndo = false;
     }
 
     public int getTabIndex() {
@@ -121,6 +131,11 @@ public class Context {
         return (getCurrentChart() & CHART_LINE) > 0;
     }
 
+
+    public boolean isPan() {
+        return (getCurrentChart() & CHART_PAN) > 0;
+    }
+
     public boolean isRect() {
         return (getCurrentChart() & CHART_REC) > 0;
     }
@@ -134,10 +149,21 @@ public class Context {
     }
 
     public Color getCurrentColor() {
+        if (Objects.isNull(currentColor)) {
+            currentColor = Color.BLACK;
+        }
         return currentColor;
     }
 
     public void setCurrentColor(Color currentColor) {
         this.currentColor = currentColor;
+    }
+
+    public boolean isUndo() {
+        return isUndo;
+    }
+
+    public void setUndo(boolean undo) {
+        isUndo = undo;
     }
 }
