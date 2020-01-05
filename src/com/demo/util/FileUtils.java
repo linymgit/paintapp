@@ -1,13 +1,10 @@
 package com.demo.util;
 
-import com.demo.entity.Chart;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.List;
 
 /**
  * @author lym
@@ -68,32 +65,5 @@ public class FileUtils {
             return file;
         }
         return null;
-    }
-
-    public static class OpenFileInfo{
-
-        List<Chart> charts;
-        String fileName;
-
-        public OpenFileInfo(List<Chart> charts, String fileName) {
-            this.charts = charts;
-            this.fileName = fileName;
-        }
-
-        public List<Chart> getCharts() {
-            return charts;
-        }
-
-        public void setCharts(List<Chart> charts) {
-            this.charts = charts;
-        }
-
-        public String getFileName() {
-            return fileName;
-        }
-
-        public void setFileName(String fileName) {
-            this.fileName = fileName;
-        }
     }
 }

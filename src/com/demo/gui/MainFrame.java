@@ -229,7 +229,6 @@ public class MainFrame implements ActionListener {
             Context.getInstance().setCls(true);
         }
         if (e.getSource().equals(undo)) {
-            Context.getInstance().undoV2();
             tp.getSelectedComponent().repaint();
         }
         if (e.getSource().equals(colorBtn)) {

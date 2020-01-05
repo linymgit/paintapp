@@ -1,13 +1,8 @@
 package com.demo.util;
 
-import com.demo.entity.Chart;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @auth linyimin
@@ -42,12 +37,6 @@ public class Context {
      */
     private boolean isCls;
 
-    /**
-     * 选择撤回
-     */
-    private boolean isUndo;
-
-    private Map<Integer, List<Chart>> chartsMap = new ConcurrentHashMap<>();
 
     private Context() {
     }
@@ -60,50 +49,6 @@ public class Context {
         static Context context = new Context();
     }
 
-    public void addChart(Chart chart) {
-        if (Objects.isNull(chart)) {
-            return;
-        }
-        List<Chart> charts = chartsMap.get(tabIndex);
-        if (Objects.isNull(charts)) {
-            charts = new ArrayList<>();
-        }
-        charts.add(chart);
-        chartsMap.put(tabIndex, charts);
-    }
-
-    public void paint(Graphics graphics) {
-        List<Chart> charts = chartsMap.get(tabIndex);
-        if (Objects.isNull(charts)) {
-            return;
-        }
-        charts.forEach(chart -> chart.paint(graphics));
-    }
-
-    public List<Chart> getCurrentCharts() {
-        return chartsMap.get(tabIndex);
-    }
-
-    public void putCharts(Integer idx, List<Chart> charts) {
-        chartsMap.put(idx, charts);
-        setTabIndex(idx);
-    }
-
-    public void removeCharts(Integer idx) {
-        chartsMap.remove(idx);
-    }
-
-    public void undo() {
-        List<Chart> charts = chartsMap.get(tabIndex);
-        if (Objects.isNull(charts)||charts.size() <= 0) {
-            return;
-        }
-        charts.remove(charts.size() - 1);
-    }
-
-    public void undoV2(){
-        isUndo = true;
-    }
 
     public int getCurrentChart() {
         return CurrentChart;
@@ -112,7 +57,6 @@ public class Context {
     public void setCurrentChart(int currentChart) {
         CurrentChart = currentChart;
         isCls = false;
-        isUndo = false;
     }
 
     public int getTabIndex() {
@@ -159,11 +103,4 @@ public class Context {
         this.currentColor = currentColor;
     }
 
-    public boolean isUndo() {
-        return isUndo;
-    }
-
-    public void setUndo(boolean undo) {
-        isUndo = undo;
-    }
 }
